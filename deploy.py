@@ -55,4 +55,32 @@ transaction = SimpleStorage.constructor().buildTransaction(
 # print(transaction)
 
 signed_txn = w3.eth.account.sign_transaction(transaction, private_key=private_key)
-print(signed_txn)
+# print(signed_txn)
+tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+# print(tx_hash)
+tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+# print(tx_receipt)
+
+simple_storage = w3.eth.contract(address=tx_receipt["contractAddress"], abi=abi)
+print(simple_storage.functions.retrieve().call())
+# print(simple_storage.functions.store(15).call())
+# print(simple_storage.functions.retrieve().call())
+
+store_transaction = simple_storage.functions.store(15).buildTransaction(
+    {
+        "chainId": 1337,
+        "gasPrice": w3.eth.gas_price,
+        "from": my_address,
+        "nonce": nonce + 1,
+    }
+)
+signed_store_txn = w3.eth.account.sign_transaction(
+    store_transaction, private_key=private_key
+)
+# print(signed_txn)
+store_tx_hash = w3.eth.send_raw_transaction(signed_store_txn.rawTransaction)
+# print(tx_hash)
+store_tx_receipt = w3.eth.wait_for_transaction_receipt(store_tx_hash)
+print(store_tx_receipt)
+
+print(simple_storage.functions.retrieve().call())
