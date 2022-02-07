@@ -38,9 +38,19 @@ abi = compiled_sol["contracts"]["SimpleStorage.sol"]["SimpleStorage"]["abi"]
 #     compiled_sol["contracts"]["SimpleStorage.sol"]["SimpleStorage"]["metadata"]
 # )["output"]["abi"]
 
-w3 = Web3(Web3.HTTPProvider("http://172.26.128.1:7545"))
-chain_id = 1337
-my_address = "0x21fDFc3b150D1db843e2E9E36156778F74c07d0b"
+### local
+# w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+# chain_id = 1337
+# my_address = "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1"
+
+### Kovan Testnet
+w3 = Web3(
+    Web3.HTTPProvider("https://kovan.infura.io/v3/337ebec549e74b9389aae2ae03f25f64")
+)
+chain_id = 42
+my_address = "0x5dA965D122C37aF890eBC4A0cC69161bE26a0837"
+
+
 private_key = os.getenv("PRIVATE_KEY")
 print(private_key)
 
@@ -50,7 +60,12 @@ nonce = w3.eth.getTransactionCount(my_address)
 # print(nonce)
 
 transaction = SimpleStorage.constructor().buildTransaction(
-    {"chainId": 1337, "gasPrice": w3.eth.gas_price, "from": my_address, "nonce": nonce}
+    {
+        "chainId": chain_id,
+        "gasPrice": w3.eth.gas_price,
+        "from": my_address,
+        "nonce": nonce,
+    }
 )
 # print(transaction)
 
@@ -68,7 +83,7 @@ print(simple_storage.functions.retrieve().call())
 
 store_transaction = simple_storage.functions.store(15).buildTransaction(
     {
-        "chainId": 1337,
+        "chainId": chain_id,
         "gasPrice": w3.eth.gas_price,
         "from": my_address,
         "nonce": nonce + 1,
